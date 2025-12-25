@@ -1,40 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merry Chistmas</title>
-    <style>
-        html,body{
-            margin: 0;
-            width: 100%;
-            height: 100%;
-        }
-        #main{
-            position: absolute;
-            top: 0;
-            left: 0;
-
-        }
-        #video_url{
-            width: 100%;
-            height: 100%;
-        }
-        .hidden{
-            display: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Merry Christmas</title>
+<style>
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+}
+video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+button{
+    position:fixed;
+    bottom:20px;
+    left:20px;
+    padding:10px 15px;
+    font-size:16px;
+}
+</style>
 </head>
+
 <body>
-    <div id="main">
-        <video src="./assets/1.mp4" id="video_url" muted="muted" autoplay="autoplay" loop="loop"></video>
-    </div>
-</body>
-<script type="text/javascript">
-    $(function(){
-        var video = document.getElementById("video_url");
-        video.src = "" ;
-        video.play();
-    })
+<video id="video_url" src="./assets/1.mp4" autoplay loop muted></video>
+<button onclick="playSound()">🔊 Bật tiếng</button>
+
+<script>
+function playSound(){
+    const video = document.getElementById("video_url");
+    video.muted = false;
+    video.play();
+}
 </script>
+</body>
 </html>
