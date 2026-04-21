@@ -1,0 +1,37 @@
+# ---------------------------------------------------------------------------
+# Permissions-Policy — restrict powerful browser APIs
+#
+# This page is a static video player.  Only "autoplay" (self-origin) and
+# "fullscreen" (self-origin) are needed.  Every other sensitive capability
+# is disabled with an empty allowlist so it cannot be accessed by the page
+# or any embedded third-party content, even if the site is compromised.
+# ---------------------------------------------------------------------------
+
+<IfModule mod_headers.c>
+    Header always set Permissions-Policy "\
+        accelerometer=(), \
+        ambient-light-sensor=(), \
+        autoplay=(self), \
+        battery=(), \
+        camera=(), \
+        display-capture=(), \
+        document-domain=(), \
+        encrypted-media=(), \
+        execution-while-not-rendered=(), \
+        execution-while-out-of-viewport=(), \
+        fullscreen=(self), \
+        geolocation=(), \
+        gyroscope=(), \
+        magnetometer=(), \
+        microphone=(), \
+        midi=(), \
+        navigation-override=(), \
+        payment=(), \
+        picture-in-picture=(), \
+        publickey-credentials-get=(), \
+        screen-wake-lock=(), \
+        sync-xhr=(), \
+        usb=(), \
+        web-share=(), \
+        xr-spatial-tracking=()"
+</IfModule>

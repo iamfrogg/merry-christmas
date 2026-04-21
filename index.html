@@ -2,6 +2,35 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<!-- Permissions-Policy: disable every powerful browser API this page does not use.
+     autoplay=self  — required for the muted video autoplay + the unmute button.
+     All sensor / capture / device APIs are explicitly denied (empty allowlist). -->
+<meta http-equiv="Permissions-Policy"
+      content="accelerometer=(),
+               ambient-light-sensor=(),
+               autoplay=(self),
+               battery=(),
+               camera=(),
+               display-capture=(),
+               document-domain=(),
+               encrypted-media=(),
+               execution-while-not-rendered=(),
+               execution-while-out-of-viewport=(),
+               fullscreen=(self),
+               geolocation=(),
+               gyroscope=(),
+               magnetometer=(),
+               microphone=(),
+               midi=(),
+               navigation-override=(),
+               payment=(),
+               picture-in-picture=(),
+               publickey-credentials-get=(),
+               screen-wake-lock=(),
+               sync-xhr=(),
+               usb=(),
+               web-share=(),
+               xr-spatial-tracking=()">
 <title>Merry Christmas</title>
 <style>
 html,body{
