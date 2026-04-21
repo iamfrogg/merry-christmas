@@ -80,7 +80,7 @@ function playSound(){
     video.play();
 }
 
-// Snowfall effect
+// Snowfall effect with mouse interaction
 const canvas = document.getElementById('snow-canvas');
 const ctx = canvas.getContext('2d');
 
@@ -94,6 +94,43 @@ window.addEventListener('resize', resizeCanvas);
 
 const snowflakes = [];
 const maxSnowflakes = 150;
+const mouse = { x: null, y: null, radius: 100 };
+
+// Mouse move listener
+canvas.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
+
+// Mouse click - create snow burst
+canvas.addEventListener('click', (e) => {
+    for (let i = 0; i < 20; i++) {
+        const flake = createSnowflake();
+        flake.x = e.clientX;
+        flake.y = e.clientY;
+        flake.vx = (Math.random() - 0.5) * 10;
+        flake.vy = (Math.random() - 0.5) * 10;
+        flake.isBurst = true;
+        flake.life = 1;
+        snowflakes.push(flake);
+    }
+});
+
+// Mouse down - increase snowfall speed
+canvas.addEventListener('mousedown', () => {
+    snowflakes.forEach(flake => {
+        flake.speed *= 1.5;
+    });
+});
+
+// Mouse up - restore normal speed
+canvas.addEventListener('mouseup', () => {
+    snowflakes.forEach(flake => {
+        if (!flake.isBurst) {
+            flake.speed = flake.speed / 1.5;
+        }
+    });
+});
 
 function createSnowflake() {
     return {
@@ -102,23 +139,65 @@ function createSnowflake() {
         radius: Math.random() * 3 + 1,
         speed: Math.random() * 1 + 0.5,
         wind: Math.random() * 0.5 - 0.25,
-        opacity: Math.random() * 0.5 + 0.5
+        opacity: Math.random() * 0.5 + 0.5,
+        vx: 0,
+        vy: 0,
+        isBurst: false,
+        life: 1
     };
 }
 
 function drawSnowflake(flake) {
     ctx.beginPath();
     ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255, 255, 255, ${flake.opacity})`;
+    
+    // Add glow effect for burst snowflakes
+    if (flake.isBurst) {
+        const gradient = ctx.createRadialGradient(flake.x, flake.y, 0, flake.x, flake.y, flake.radius * 2);
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${flake.opacity * flake.life})`);
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = gradient;
+    } else {
+        ctx.fillStyle = `rgba(255, 255, 255, ${flake.opacity})`;
+    }
+    
     ctx.fill();
 }
 
 function updateSnowflake(flake) {
-    flake.y += flake.speed;
-    flake.x += flake.wind + Math.sin(flake.y * 0.01) * 0.5;
-    
-    if (flake.y > canvas.height || flake.x < -50 || flake.x > canvas.width + 50) {
-        Object.assign(flake, createSnowflake());
+    if (flake.isBurst) {
+        // Burst animation
+        flake.x += flake.vx;
+        flake.y += flake.vy;
+        flake.vy += 0.2; // gravity
+        flake.life -= 0.01;
+        
+        if (flake.life <= 0) {
+            snowflakes.splice(snowflakes.indexOf(flake), 1);
+            return;
+        }
+    } else {
+        // Normal falling animation
+        flake.y += flake.speed;
+        flake.x += flake.wind + Math.sin(flake.y * 0.01) * 0.5;
+        
+        // Mouse interaction - push snowflakes away
+        if (mouse.x !== null && mouse.y !== null) {
+            const dx = flake.x - mouse.x;
+            const dy = flake.y - mouse.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < mouse.radius) {
+                const force = (mouse.radius - distance) / mouse.radius;
+                const angle = Math.atan2(dy, dx);
+                flake.x += Math.cos(angle) * force * 5;
+                flake.y += Math.sin(angle) * force * 5;
+            }
+        }
+        
+        if (flake.y > canvas.height || flake.x < -50 || flake.x > canvas.width + 50) {
+            Object.assign(flake, createSnowflake());
+        }
     }
 }
 
@@ -126,15 +205,24 @@ function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Add new snowflakes
-    while (snowflakes.length < maxSnowflakes && Math.random() < 0.3) {
+    while (snowflakes.length < maxSnowflakes + 50 && Math.random() < 0.3) {
         snowflakes.push(createSnowflake());
     }
     
     // Update and draw all snowflakes
-    snowflakes.forEach(flake => {
-        updateSnowflake(flake);
-        drawSnowflake(flake);
-    });
+    for (let i = snowflakes.length - 1; i >= 0; i--) {
+        updateSnowflake(snowflakes[i]);
+        drawSnowflake(snowflakes[i]);
+    }
+    
+    // Draw mouse interaction circle (subtle)
+    if (mouse.x !== null && mouse.y !== null) {
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, mouse.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
     
     requestAnimationFrame(animate);
 }
